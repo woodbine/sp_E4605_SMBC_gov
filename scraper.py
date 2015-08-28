@@ -63,7 +63,7 @@ def convert_mth_strings ( mth_string ):
     return mth_string
 # pull down the content from the webpage
 html = requests.get(url)
-soup = BeautifulSoup(html.text)
+soup = BeautifulSoup(html.text, 'lxml')
 # find all entries with the required class
 #block = soup.find('div', attrs = {'id':'dnn_ctr8480_HtmlModule_lblContent'})
 links = soup.find_all('a', href =True)
