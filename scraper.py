@@ -38,23 +38,26 @@ def validateFilename(filename):
 
 def validateURL(url):
     try:
-        r = requests.get(url, allow_redirects=True, timeout=20)
+        r = urllib2.urlopen(url)
         count = 1
-        while r.status_code == 500 and count < 4:
+        while r.getcode() == 500 and count < 4:
             print ("Attempt {0} - Status code: {1}. Retrying.".format(count, r.status_code))
             count += 1
-            r = requests.get(url, allow_redirects=True, timeout=20)
+            r = urllib2.urlopen(url)
         sourceFilename = r.headers.get('Content-Disposition')
         if sourceFilename:
             ext = os.path.splitext(sourceFilename)[1].replace('"', '').replace(';', '').replace(' ', '')
+        elif r.headers['Content-Type'] == 'text/html; charset=utf-8':
+            ext = '.csv'
         else:
             ext = os.path.splitext(url)[1]
-        validURL = r.status_code == 200
+        validURL = r.getcode() == 200
         validFiletype = ext in ['.csv', '.xls', '.xlsx']
         return validURL, validFiletype
     except:
         print ("Error validating URL.")
         return False, False
+
 
 def validate(filename, file_url):
     validFilename = validateFilename(filename)
@@ -88,8 +91,8 @@ url = "http://www.solihull.gov.uk/About-the-Council/Performance-spending/council
 errors = 0
 data = []
 
-#### READ HTML 1.0
-
+#### READ HTML 1.2
+import requests   # import requests to get no errors
 
 html = requests.get(url)
 soup = BeautifulSoup(html.text, 'lxml')
@@ -97,7 +100,7 @@ soup = BeautifulSoup(html.text, 'lxml')
 
 #### SCRAPE DATA
 
-links = soup.find_all('a', href =True)
+links = soup.find_all('a', href=True)
 for link in links:
     csvfile = link.text
     if 'CSV' in csvfile:
