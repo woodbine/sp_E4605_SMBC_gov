@@ -107,7 +107,7 @@ for link in links:
         url = 'http://www.solihull.gov.uk' + link['href']
         csvfiles = url.split('Expenditure')[-1].split('.csv')[0]
         csvYr = csvfiles[-4:]
-        csvMth = csvfiles[:3]
+        csvMth = csvfiles.strip('-')[:3]
         csvMth = convert_mth_strings(csvMth.upper())
         data.append([csvYr, csvMth, url])
 
@@ -132,5 +132,3 @@ if errors > 0:
 
 
 #### EOF
-
-
